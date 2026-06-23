@@ -1,23 +1,39 @@
-# Post-Training Pipeline for 12B MoE (Mellum 2)
+# Experimental Post-Training Loop on Mellum 2 (12B)
 
-This repository contains the end-to-end data pipeline, distributed training scripts (SFT and DPO), and evaluation framework for post-training the JetBrains Mellum2-12B thinking model to improve algorithmic reasoning capabilities. 
+This repository contains the data cleaning scripts, local DPO scoring setup, and FSDP training configs used to fine-tune the JetBrains Mellum 2 12B model.
 
-# Datasets
-For SFT we download nvidia/OpenCodeReasoning (OCR) dataset, shortlist 3000 decontaminated medium and hard problems with think traces. 
-For DPO we download allenai/Dolci-Think-RL-7B-Completions-DPO (Dolci), decontaminate, score the "good" and "bad" locally through a Docker setup and shortlist pairs which have syntactially valid by logically good (or bad) scores. Resulted in 2439 pairs.
+## Datasets
+* **SFT:** 3,000 samples filtered from `nvidia/OpenCodeReasoning` (OCR), focusing on medium and hard problems that include thinking traces.
+* **DPO:** 2,439 clean pairs prepared from `allenai/Dolci-Think-RL-7B-Completions-DPO`. 
+* **Processing:** All samples were decontaminated against the LiveCodeBench v6 dataset using exact matches and text similarity filters. The DPO pairs were verified locally using a Docker sandbox setup to filter for syntactically valid outputs where the chosen response met the logic requirements and the rejected response failed.
 
-# Hardware
-For training and inference we use a 4xA100 (80GB each) machine. 
+## Infrastructure & Distributed Training
+* **Hardware:** A rented cloud cluster of 4x A100 (80GB) and a local RTX 3090 (used for dataset decontamination, testing vLLM inference, testing training, and Docker scoring) and .
+* **FSDP Setup:** Trained using PyTorch FSDP (`FULL_SHARD`) across the 4 GPUs. Every decoder layer is sharded across the cluster. While the model fits easily within this VRAM pool, this strategy incurs a communication overhead since all 64 experts must be synchronized across the GPUs during the passes, even though only 8 experts are active per token. 
 
-# Distributed training setup
-The model is sharded using torch FSDP (FULL_SHARD) across 4 GPUs. Each decoder layer is sharded across the GPUs. While the model can train comfortably inside the machine, this strategy introduces high network cost because all experts must be loaded for each GPU although only 8 out of 64 experts are actually used.
+## Training Configurations
 
-# Training configs
-## SFT: 
-Epochs:2, Micro-Batch-size:1, Gradient accumulation: 8, LR: 1e-5 with a linear warmup and linear decay, AdamW.
-## DPO:
-Epochs: 1, Micro-Batch-size:1, Gradient accumulation: 8, LR: 5e-7, Beta: 0.1.
-Both runs took a combined of 2-3 hours excluding data preparation and environment setup.
+### SFT
+* Epochs: 2
+* Micro-batch size: 1
+* Gradient accumulation steps: 8
+* Learning rate: 1e-5 (linear warmup and decay)
+* Optimizer: AdamW
 
-# Evaluation
-We evaluated the model results (before and after) on the LiveCodeBench v6. The evaluation pipeline uses vLLM. The Pass@1 for the original model is 0.3 while for the post-trained it is 0.19. This decrease in result is most likely because of the overfitting on small dataset and forcing the model to adopt a strict reasoning style. 
+### DPO
+* Epochs: 1
+* Micro-batch size: 1
+* Gradient accumulation steps: 8
+* Learning rate: 5e-7
+* Beta: 0.1
+
+The total compute time on the cluster was roughly 2.5 hours excluding testing and setup.
+
+## Evaluation & Results
+Evaluation was performed on LiveCodeBench v6 using an identical configuration and a generation length constraint for both models.
+
+* **Original Mellum 2 Base:** 0.30 Pass@1
+* **Post-Trained Checkpoint:** 0.19 Pass@1
+
+### Analysis
+The drop in benchmark performance indicates style overfitting. Forcing the model to adopt the specific reasoning and formatting structure found in the training sets likely disrupted its raw code syntax generation or biased it away from the exact structure expected by the LiveCodeBench evaluation harness. Under a limited compute budget we could only use a small train set and could not experiment with different training strategies. To fix these, future runs should blend the training samples with standard base-formatting examples and experiment with different training recipes. 
