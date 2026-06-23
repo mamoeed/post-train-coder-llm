@@ -20,4 +20,4 @@ Epochs: 1, Micro-Batch-size:1, Gradient accumulation: 8, LR: 5e-7, Beta: 0.1.
 Both runs took a combined of 2-3 hours excluding data preparation and environment setup.
 
 # Evaluation
-We evaluated the model results (before and after) on the LiveCodeBench v6. The Pass@1 for the original model is 0.3 while for the post-trained it is 0.19. This decrease in result is most likely because of the overfitting on small dataset and forcing the model to adopt a strict reasoning style. 
+We evaluated the model results (before and after) on the LiveCodeBench v6. The evaluation pipeline uses vLLM. The Pass@1 for the original model is 0.3 while for the post-trained it is 0.19. This decrease in result is most likely because of the overfitting on small dataset and forcing the model to adopt a strict reasoning style. 
