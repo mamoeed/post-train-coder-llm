@@ -4,7 +4,7 @@ This repository contains the end-to-end data pipeline, distributed training scri
 
 # Datasets
 For SFT we download nvidia/OpenCodeReasoning (OCR) dataset, shortlist 3000 decontaminated medium and hard problems with think traces. 
-For DPO we download allenai/Dolci-Think-RL-7B-Completions-DPO (Dolci), decontaminate, score the "good" and "bad" locally through a Docker setup and shortlist pairs which have syntactially valid by logically good (or bad) scores. 
+For DPO we download allenai/Dolci-Think-RL-7B-Completions-DPO (Dolci), decontaminate, score the "good" and "bad" locally through a Docker setup and shortlist pairs which have syntactially valid by logically good (or bad) scores. Resulted in 2439 pairs.
 
 # Hardware
 For training and inference we use a 4xA100 (80GB each) machine. 
