@@ -6,7 +6,7 @@ Launch (4xA100 single node):
         --model JetBrains/Mellum2-12B-A2.5B-Thinking \
         --data out/sft_clean.jsonl \
         --out ckpts/sft \
-        --epochs 3 --max-seq-len 8192 --micro-bsz 1 --grad-accum 8 --lr 1e-5
+        --epochs 2 --max-seq-len 8192 --micro-bsz 1 --grad-accum 8 --lr 1e-5
 
 Design choices (see README_training.md):
   - FULL_SHARD (ZeRO-3), transformer-block auto-wrap (decoder layer class
