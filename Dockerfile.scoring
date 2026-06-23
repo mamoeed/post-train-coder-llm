@@ -1,0 +1,14 @@
+# Dockerfile.scoring
+# Sandboxed environment for executing model-written code (score_dolci.py).
+# Aligned with LiveCodeBench: Standard Library ONLY. No external ML packages.
+# Run with --network none for isolation.
+
+FROM python:3.11-slim
+
+# Create a non-root user -- model code should not run as root even inside the container.
+RUN useradd -m -u 1000 runner
+USER runner
+WORKDIR /work
+
+# Script + data mounted at runtime (see run_scoring_docker.sh).
+ENTRYPOINT ["python", "score_dolci.py"]
