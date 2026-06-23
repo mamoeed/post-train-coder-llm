@@ -1,5 +1,6 @@
-# Description
-Code for supervised finetuning (SFT) and direct preference optimization (DPO) of Mellum 2, a 12B param mixture-of-experts architecture (2.5B active) specialized for coding tasks. We evaluate the Pass@1 score of the model on LiveCodeBench v6. 
+# Post-Training Pipeline for 12B MoE (Mellum 2)
+
+This repository contains the end-to-end data pipeline, distributed training scripts (SFT and DPO), and evaluation framework for post-training the JetBrains Mellum2-12B thinking model to improve algorithmic reasoning capabilities. 
 
 # Datasets
 For SFT we download nvidia/OpenCodeReasoning (OCR) dataset, shortlist 3000 decontaminated medium and hard problems with think traces. 
