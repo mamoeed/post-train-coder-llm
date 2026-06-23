@@ -33,7 +33,7 @@ The total compute time on the cluster was roughly 2.5 hours excluding testing an
 ## Evaluation & Results
 Evaluation was performed on LiveCodeBench v6 using an identical configuration and a generation length constraint for both models.
 
-* **Original Mellum 2 Base:** 0.30 Pass@1
+* **Original Mellum 2 Thinking:** 0.30 Pass@1
 * **Post-Trained Checkpoint:** 0.19 Pass@1
 
 Hugging Face: https://huggingface.co/mamoeed/Mellum2-12B-post-post-train
